@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tebak Negara ASEAN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --primary: #4f8cff;
+      --primary-dark: #2563eb;
+      --accent: #fbbf24;
+      --bg: #f3f4f6;
+      --card: #fff;
+      --text: #22223b;
+      --hint: #6b7280;
+      --success: #22c55e;
+      --error: #ef4444;
+    }
+    body {
+      background: var(--bg);
+      font-family: 'Inter', Arial, sans-serif;
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .container {
+      background: var(--card);
+      margin-top: 48px;
+      padding: 32px 24px 24px 24px;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(79, 140, 255, 0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+      max-width: 350px;
+      width: 100%;
+    }
+    h1 {
+      color: var(--primary-dark);
+      font-size: 2rem;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    .hint {
+      color: var(--hint);
+      margin-bottom: 18px;
+      font-size: 1rem;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .country-list {
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 1.05rem;
+    }
+    button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s, transform 0.2s;
+      box-shadow: 0 2px 8px rgba(79, 140, 255, 0.08);
+    }
+    button:hover, button:focus {
+      background: var(--primary-dark);
+      transform: translateY(-2px) scale(1.03);
+    }
+    #game-area {
+      margin-top: 18px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      border: 1.5px solid var(--primary);
+      border-radius: 8px;
+      font-size: 1rem;
+      width: 80%;
+      margin-bottom: 10px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    input[type="text"]:focus {
+      border: 2px solid var(--primary-dark);
+    }
+    .result {
+      margin-top: 18px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      min-height: 24px;
+      transition: color 0.2s;
+    }
+    .result.success { color: var(--success); }
+    .result.error { color: var(--error); }
+    @media (max-width: 480px) {
+      .container { padding: 18px 6px; }
+      h1 { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Game Tebak Negara ASEAN</h1>
+    <div class="hint">
+      Tebak salah satu dari <b>5 negara ASEAN</b> berikut:
+      <div class="country-list">
+        Indonesia, Malaysia, Singapura, Thailand, Vietnam
+      </div>
+    </div>
+    <button id="start-btn">Mulai Game</button>
+    <div id="game-area" style="display:none;">
+      <p>Masukkan tebakan negara Anda:</p>
+      <input type="text" id="guess-input" placeholder="Contoh: Indonesia" autocomplete="off" />
+      <button id="guess-btn">Tebak</button>
+      <div class="result" id="result"></div>
+    </div>
+  </div>
+  <script type="module">
+    import { backend } from "declarations/backend";
+
+    document.getElementById('start-btn').onclick = async () => {
+      const msg = await backend.pickCountry();
+      document.getElementById('game-area').style.display = 'block';
+      document.getElementById('result').textContent = msg;
+      document.getElementById('result').className = 'result';
+      document.getElementById('guess-input').value = '';
+      document.getElementById('guess-input').focus();
+    };
+
+    document.getElementById('guess-btn').onclick = async () => {
+      const guess = document.getElementById('guess-input').value;
+      const result = await backend.guessCountry(guess);
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = result;
+      if (result.startsWith("Benar")) {
+        resultDiv.className = 'result success';
+      } else {
+        resultDiv.className = 'result error';
+      }
+    };
+  </script>
+</body>
+</html>
